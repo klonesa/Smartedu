@@ -1,20 +1,30 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const pageRoute = require("./routes/pageRoute");
+const courseRoute = require("./routes/courseRoute");
+const categoryRoute = require('./routes/categoryRoute');
+
+const Course=require('./models/Course');
 const app = express();
-
-app.set('view engine',"ejs");
-app.use(express.static('public'));
- 
-app.get("/", (req, res) => {
-  res.status(200).render("index",{
-    page_name:"index"
+//Connect DB
+mongoose
+  .connect("mongodb://localhost/smartedu-db", {
+   
+    useUnifiedTopology: true,
+  
+  })
+  .then(() => {
+    console.log("DB Connected Successfully");
   });
-});
-app.get("/about", (req, res) => {
-  res.status(200).render("about",{
-    page_name:"about",
-  });
-});
 
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+app.use("/", pageRoute);
+app.use('/courses', courseRoute);
+app.use('/categories', categoryRoute);
 const port = 3000;
 app.listen(port, () => {
   console.log(`App started  on port ${port}`);
